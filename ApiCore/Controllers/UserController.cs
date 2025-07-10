@@ -1,0 +1,54 @@
+﻿using Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Model.Request;
+
+namespace ApiCore.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserController(IUserService userService) : ControllerBase
+    {
+        [HttpPost("CreateUser")]
+        public async Task<IActionResult> CreateUser(UserRequest user)
+        {
+            try
+            {
+                var response = await userService.CreateUser(user);
+
+                if (response)
+                {
+                    return Ok(new {status=true, message = "Usuario creado con éxito" });
+                }
+                return StatusCode(StatusCodes.Status404NotFound, new { status = false, message = "El email ya se encuentra regitrasdo" });
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex });
+            }
+            
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequest user)
+        {
+            try
+            {
+                var response = await userService.Login(user);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                return StatusCode(StatusCodes.Status404NotFound, new { status = false, message = "Credenciales incorrectas" });
+                }
+                 return Ok(new { status = true, data = response });
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex });
+            }
+
+        }
+    }
+}
