@@ -9,7 +9,7 @@ namespace ApiCore.Controllers
     [ApiController]
     public class UserController(IUserService userService) : ControllerBase
     {
-        [Authorize]
+       [Authorize]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(UserRequest user)
         {
@@ -19,7 +19,7 @@ namespace ApiCore.Controllers
 
                 if (response) return Ok(new { status = true, message = "Usuario creado con éxito" });
 
-                return StatusCode(StatusCodes.Status200OK, new { status = false, message = "El email ya se encuentra regitrasdo" });
+                return StatusCode(StatusCodes.Status200OK, new { status = false, message = "El email ya se encuentra registrado" });
             }
             catch (Exception ex) { return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex }); }
 
