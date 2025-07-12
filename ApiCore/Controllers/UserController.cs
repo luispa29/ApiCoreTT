@@ -19,7 +19,7 @@ namespace ApiCore.Controllers
 
                 if (response) return Ok(new { status = true, message = "Usuario creado con éxito" });
 
-                return StatusCode(StatusCodes.Status404NotFound, new { status = false, message = "El email ya se encuentra regitrasdo" });
+                return StatusCode(StatusCodes.Status200OK, new { status = false, message = "El email ya se encuentra regitrasdo" });
             }
             catch (Exception ex) { return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex }); }
 
@@ -32,7 +32,7 @@ namespace ApiCore.Controllers
             {
                 string response = await userService.Login(user);
 
-                if (string.IsNullOrEmpty(response)) return StatusCode(StatusCodes.Status404NotFound, new { status = false, message = "Credenciales incorrectas" });
+                if (string.IsNullOrEmpty(response)) return StatusCode(StatusCodes.Status200OK, new { status = false, message = "Credenciales incorrectas" });
 
                 return Ok(new { status = true, data = response });
             }

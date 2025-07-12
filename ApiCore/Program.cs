@@ -13,9 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 #region Token
-
 
 var appSettingsSection = builder.Configuration.GetSection("AppSettings");
 builder.Services.Configure<AppSettings>(appSettingsSection);
@@ -23,12 +21,15 @@ builder.Services.Configure<AppSettings>(appSettingsSection);
 
 //JWT
 var appSettings = appSettingsSection.Get<AppSettings>();
+if (appSettings == null || string.IsNullOrEmpty(appSettings.Secret))
+{
+    throw new InvalidOperationException("AppSettings or Secret is not configured properly.");
+}
 
 var llave = Encoding.ASCII.GetBytes(appSettings.Secret);
 
 builder.Services.AddAuthentication(d =>
 {
-
     d.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     d.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -43,10 +44,21 @@ builder.Services.AddAuthentication(d =>
             ValidateIssuer = false,
             ValidateAudience = false
         };
-
     });
 
 #endregion
+
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("all", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Configure the HTTP request pipeline.
 Dependency.AddDependencyDeclaration(builder.Services);
 
@@ -59,6 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("all");
 
 app.UseAuthorization();
 
