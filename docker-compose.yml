@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ApiCore/Dockerfile
+    ports:
+      - "5002:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+    networks:
+      - api_network
+
+networks:
+  api_network:
+    external: true

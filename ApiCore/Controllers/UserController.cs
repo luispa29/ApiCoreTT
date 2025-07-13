@@ -1,6 +1,8 @@
 ﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Model;
 using Model.Request;
 
 namespace ApiCore.Controllers
@@ -9,7 +11,7 @@ namespace ApiCore.Controllers
     [ApiController]
     public class UserController(IUserService userService) : ControllerBase
     {
-       [Authorize]
+        [Authorize]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser(UserRequest user)
         {
@@ -21,8 +23,14 @@ namespace ApiCore.Controllers
 
                 return StatusCode(StatusCodes.Status200OK, new { status = false, message = "El email ya se encuentra registrado" });
             }
-            catch (Exception ex) { return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex }); }
-
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse()
+                {
+                    Details = ex.Message,
+                    Status = false
+                });
+            }
         }
 
         [HttpPost("Login")]
@@ -36,9 +44,15 @@ namespace ApiCore.Controllers
 
                 return Ok(new { status = true, data = response });
             }
-            catch (Exception ex) { return StatusCode(StatusCodes.Status500InternalServerError, new { status = false, message = "Ocurrio un error", data = ex }); }
 
-
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse()
+                {
+                    Details = ex.Message,
+                    Status = false
+                });
+            }
         }
     }
 }

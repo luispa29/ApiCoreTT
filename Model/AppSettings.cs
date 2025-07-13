@@ -11,5 +11,7 @@ namespace Model
         public string? DefaultConnection { get; set; }
 
         public string? Secret { get; set; }
+
+        public bool Docker { get; set; }
     }
 }

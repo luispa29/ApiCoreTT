@@ -12,6 +12,7 @@ namespace Infrastructure
     {
         public string GenereToken(string email)
         {
+            email = "Esto es solo para prueba";
             var tokenHandler = new JwtSecurityTokenHandler();
 
             try

@@ -62,13 +62,13 @@ builder.Services.AddCors(options =>
 // Configure the HTTP request pipeline.
 Dependency.AddDependencyDeclaration(builder.Services);
 
+if (appSettings.Docker) builder.WebHost.UseUrls("http://0.0.0.0:80");
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -77,5 +77,28 @@ app.UseCors("all");
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = 500;
+
+        var errorResponse = new
+        {
+            message = ex.Message,
+            stackTrace = app.Environment.IsDevelopment() ? ex.StackTrace : null
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+        await context.Response.WriteAsync(json);
+    }
+});
+
 
 app.Run();
